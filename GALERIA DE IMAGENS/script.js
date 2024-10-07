@@ -5,6 +5,8 @@ const botaoFecharGaleria = document.querySelector('#botao-fechar-galeria');
 const modal = document.getElementById("modal");
 const modalImage = document.getElementById("modal-image");
 
+const sideNavPrev = document.getElementById('side-prev');
+const sideNavNext = document.getElementById('side-next');
 const nextButton = document.getElementById("next");
 const prevButton = document.getElementById("prev");
 const rotateLeftButton = document.getElementById("rotate-left");
@@ -20,14 +22,142 @@ const downloadButton = document.getElementById("download");
 const downloadButtonWithEffects = document.getElementById("download-efeitos");
 const closeButton = document.getElementById("close");
 
+const loginModal = document.getElementById('login-modal');
+const loginSection = document.getElementById('login-section');
+const registerSection = document.getElementById('register-section');
+const loginForm = document.getElementById('login-form');
+const registerForm = document.getElementById('register-form');
+const cancelLoginButton = document.getElementById('cancel-login');
+const cancelRegisterButton = document.getElementById('cancel-register');
+const switchToRegisterButton = document.getElementById('switch-to-register');
+const switchToLoginButton = document.getElementById('switch-to-login');
 
+
+// Mock user credentials (in a real application, this would be handled server-side)
+let users = [
+    {
+        username: 'admin',
+        password: 'admin',
+        email: 'admin@admin.com'
+    }
+];
+
+// Login state
+let isLoggedIn = false;
+
+
+// Show/Hide Modal Functions
+function showLoginModal() {
+    loginModal.style.display = 'flex';
+    loginSection.style.display = 'block';
+    registerSection.style.display = 'none';
+}
+
+function hideLoginModal() {
+    loginModal.style.display = 'none';
+    loginForm.reset();
+    registerForm.reset();
+}
+
+function switchToRegister() {
+    loginSection.style.display = 'none';
+    registerSection.style.display = 'block';
+}
+
+function switchToLogin() {
+    registerSection.style.display = 'none';
+    loginSection.style.display = 'block';
+}
+
+// Login form submission
+loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const username = document.getElementById('login-username').value;
+    const password = document.getElementById('login-password').value;
+
+    const user = users.find(u => u.username === username && u.password === password);
+
+    if (user) {
+        isLoggedIn = true;
+        hideLoginModal();
+        document.getElementById('galeria').style.display = 'block';
+        // Show upload section after successful login
+        uploadSection.style.display = 'block';
+    } else {
+        alert('Usuário ou senha incorretos!');
+    }
+});
+
+// Register form submission
+registerForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const username = document.getElementById('register-username').value;
+    const email = document.getElementById('register-email').value;
+    const password = document.getElementById('register-password').value;
+    const confirmPassword = document.getElementById('register-confirm-password').value;
+
+    // Basic validation
+    if (password !== confirmPassword) {
+        alert('As senhas não correspondem!');
+        return;
+    }
+
+    if (users.some(u => u.username === username)) {
+        alert('Este nome de usuário já está em uso!');
+        return;
+    }
+
+    if (users.some(u => u.email === email)) {
+        alert('Este email já está em uso!');
+        return;
+    }
+
+    // Add new user
+    users.push({
+        username,
+        email,
+        password
+    });
+
+    alert('Registro realizado com sucesso! Faça login para continuar.');
+    switchToLogin();
+    registerForm.reset();
+});
+
+// Navigation button listeners
+switchToRegisterButton.addEventListener('click', switchToRegister);
+switchToLoginButton.addEventListener('click', switchToLogin);
+cancelLoginButton.addEventListener('click', hideLoginModal);
+cancelRegisterButton.addEventListener('click', hideLoginModal);
+
+
+// Modify the gallery open logic to restore uploaded images
+const originalGalleryOpen = botaoAbrirGaleria.onclick;
 botaoAbrirGaleria.addEventListener('click', () => {
-    galeria.style.display = 'block';
+    if (isLoggedIn) {
+        document.getElementById('galeria').style.display = 'block';
+        // Show upload section if already logged in
+        uploadSection.style.display = 'block';
+    } else {
+        showLoginModal();
+    }
 });
 
 botaoFecharGaleria.addEventListener('click', () => {
-    galeria.style.display = 'none';
+    document.getElementById('galeria').style.display = 'none';
+    // Hide upload section when closing gallery
+    uploadSection.style.display = 'none';
 });
+
+function logout() {
+    isLoggedIn = false;
+    document.getElementById('galeria').style.display = 'none';
+    uploadSection.style.display = 'none';
+    // Clear any uploaded images if desired
+    // uploadedImages = [];
+}
 
 imagens.forEach(image => {
     image.addEventListener("click", () => {
@@ -53,17 +183,41 @@ imagens.forEach((image, index) => {
 
 let currentImageIndex = 0;
 
-nextButton.addEventListener("click", () => {
-    currentImageIndex = (currentImageIndex + 1) % imagens.length;
-    updateModalImage();
+nextButton.addEventListener('click', () => {
+    navigateToImage(currentImageIndex + 1);
 });
 
-prevButton.addEventListener("click", () => {
-    if (currentImageIndex > 0) {
-        currentImageIndex = (currentImageIndex - 1 + imagens.length) % imagens.length;
-        updateModalImage();
-    }
+prevButton.addEventListener('click', () => {
+    navigateToImage(currentImageIndex - 1);
 });
+
+// Add side navigation button click handlers
+sideNavNext.addEventListener('click', () => {
+    navigateToImage(currentImageIndex + 1);
+});
+
+sideNavPrev.addEventListener('click', () => {
+    navigateToImage(currentImageIndex - 1);
+});
+
+
+// Update the modal open handler
+function openImageModal(image) {
+    const allImages = getAllImages();
+    currentImageIndex = allImages.indexOf(image);
+    modalImage.src = image.src;
+    modal.style.display = 'flex';
+    updateNavigationButtons();
+}
+
+// Update image click handlers
+function setupImageClickHandlers() {
+    const allImages = getAllImages();
+    allImages.forEach(image => {
+        image.onclick = () => openImageModal(image);
+    });
+}
+
 
 rotateLeftButton.addEventListener("click", () => {
     rotateImage(-90);
@@ -133,8 +287,13 @@ downloadButtonWithEffects.addEventListener("click", () => {
     downloadModalImageWithEffects();
 });
 
-closeButton.addEventListener("click", () => {
-    modal.style.display = "none";
+// Update the modal close handler
+closeButton.addEventListener('click', () => {
+    modal.style.display = 'none';
+    // Reset any active effects
+    modalImage.style.transform = '';
+    modalImage.style.filter = '';
+    currentZoom = 1;
 });
 
 // Função para atualizar a imagem exibida na modal
@@ -202,3 +361,179 @@ function downloadModalImageWithEffects() {
         link.click();
     });
 }
+
+// Upload-related elements
+const openUploadButton = document.getElementById('open-upload-modal');
+const uploadModal = document.getElementById('upload-modal');
+const uploadSection = document.getElementById('upload-section');
+const uploadForm = document.getElementById('upload-form');
+const fileInput = document.getElementById('file-input');
+const dropZone = document.getElementById('drop-zone');
+const previewContainer = document.getElementById('preview-container');
+const cancelUploadButton = document.getElementById('cancel-upload');
+const grid = document.querySelector('.grid');
+
+// Store uploaded images
+let uploadedImages = [];
+
+// Upload Modal Functions
+function showUploadModal() {
+    uploadModal.style.display = 'flex';
+}
+
+function hideUploadModal() {
+    uploadModal.style.display = 'none';
+    clearPreview();
+}
+
+function clearPreview() {
+    previewContainer.innerHTML = '';
+    fileInput.value = '';
+}
+
+// File Handling Functions
+function handleFiles(files) {
+    const validFiles = Array.from(files).filter(file => {
+        const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if (!validTypes.includes(file.type)) {
+            alert(`Tipo de arquivo inválido: ${file.name}. Apenas JPG, PNG e GIF são permitidos.`);
+            return false;
+        }
+        return true;
+    });
+
+    validFiles.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const previewItem = createPreviewItem(e.target.result);
+            previewContainer.appendChild(previewItem);
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+function createPreviewItem(imgSrc) {
+    const div = document.createElement('div');
+    div.className = 'preview-item';
+
+    const img = document.createElement('img');
+    img.src = imgSrc;
+
+    const removeButton = document.createElement('button');
+    removeButton.className = 'remove-preview';
+    removeButton.innerHTML = '×';
+    removeButton.onclick = function () {
+        div.remove();
+    };
+
+    div.appendChild(img);
+    div.appendChild(removeButton);
+    return div;
+}
+
+function addImageToGallery(imgSrc) {
+    const newImageDiv = document.createElement('div');
+    newImageDiv.className = 'imagem';
+
+    const img = document.createElement('img');
+    img.src = imgSrc;
+    img.alt = 'Imagem Carregada';
+
+    newImageDiv.appendChild(img);
+    grid.appendChild(newImageDiv);
+
+    uploadedImages.push(imgSrc);
+
+    // Update click handlers after adding new image
+    setupImageClickHandlers();
+}
+
+document.addEventListener('keydown', (e) => {
+    if (modal.style.display === 'flex') {
+        switch (e.key) {
+            case 'ArrowLeft':
+                navigateToImage(currentImageIndex - 1);
+                break;
+            case 'ArrowRight':
+                navigateToImage(currentImageIndex + 1);
+                break;
+            case 'Escape':
+                modal.style.display = 'none';
+                break;
+        }
+    }
+});
+
+// Event Listeners
+openUploadButton.addEventListener('click', showUploadModal);
+cancelUploadButton.addEventListener('click', hideUploadModal);
+
+dropZone.addEventListener('click', () => fileInput.click());
+
+fileInput.addEventListener('change', (e) => {
+    handleFiles(e.target.files);
+});
+
+dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('dragover');
+});
+
+dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('dragover');
+});
+
+dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    handleFiles(e.dataTransfer.files);
+});
+
+uploadForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const previewImages = previewContainer.querySelectorAll('img');
+    if (previewImages.length === 0) {
+        alert('Por favor, selecione pelo menos uma imagem para enviar.');
+        return;
+    }
+
+    previewImages.forEach(img => {
+        addImageToGallery(img.src);
+    });
+
+    hideUploadModal();
+    alert('Imagens enviadas com sucesso!');
+});
+
+function updateNavigationButtons() {
+    // Update side navigation buttons
+    sideNavPrev.disabled = currentImageIndex === 0;
+    sideNavNext.disabled = currentImageIndex === getAllImages().length - 1;
+
+    // Update bottom navigation buttons
+    prevButton.disabled = currentImageIndex === 0;
+    nextButton.disabled = currentImageIndex === getAllImages().length - 1;
+}
+
+function getAllImages() {
+    const existingImages = Array.from(imagens);
+    const uploadedImageElements = Array.from(document.querySelectorAll('.imagem img')).filter(img => !img.closest('.preview-item'));
+    return uploadedImageElements;
+}
+
+function navigateToImage(index) {
+    const allImages = getAllImages();
+    if (index >= 0 && index < allImages.length) {
+        currentImageIndex = index;
+        modalImage.src = allImages[currentImageIndex].src;
+        updateNavigationButtons();
+
+        // Reset any active effects
+        modalImage.style.transform = '';
+        modalImage.style.filter = '';
+        currentZoom = 1;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', setupImageClickHandlers);
