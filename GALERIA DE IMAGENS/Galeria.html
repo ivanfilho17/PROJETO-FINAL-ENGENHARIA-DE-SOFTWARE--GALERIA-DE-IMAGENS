@@ -11,110 +11,204 @@
 
     <header>
         <h1>Galeria de Imagens</h1>
-        <div  class= "button">
+        <div class="button">
             <button id="botao-abrir-galeria">Abrir Galeria</button>
         </div>
-        
+
     </header>
+
+    <div id="login-modal" class="login-modal">
+        <div class="login-content">
+            <!-- Login Form -->
+            <div id="login-section">
+                <h2>Login</h2>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="login-username">Usuário:</label>
+                        <input type="text" id="login-username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Senha:</label>
+                        <input type="password" id="login-password" required>
+                    </div>
+                    <div class="form-buttons">
+                        <button type="submit">Entrar</button>
+                        <button type="button" id="cancel-login">Cancelar</button>
+                    </div>
+                    <div class="form-switch">
+                        Não tem uma conta? <button type="button" id="switch-to-register">Registrar</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Register Form -->
+            <div id="register-section" style="display: none;">
+                <h2>Registro</h2>
+                <form id="register-form">
+                    <div class="form-group">
+                        <label for="register-username">Usuário:</label>
+                        <input type="text" id="register-username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-email">Email:</label>
+                        <input type="email" id="register-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">Senha:</label>
+                        <input type="password" id="register-password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-confirm-password">Confirmar Senha:</label>
+                        <input type="password" id="register-confirm-password" required>
+                    </div>
+                    <div class="form-buttons">
+                        <button type="submit">Registrar</button>
+                        <button type="button" id="cancel-register">Cancelar</button>
+                    </div>
+                    <div class="form-switch">
+                        Já tem uma conta? <button type="button" id="switch-to-login">Login</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
 
     <main>
+
+
+        <!-- Upload Section -->
+        <div id="upload-section" class="upload-section" style="display: none;">
+            <button id="open-upload-modal" class="upload-button">
+                <i class="upload-icon">+</i>
+                Adicionar Imagem
+            </button>
+        </div>
+
+        <!-- Upload Modal -->
+        <div id="upload-modal" class="upload-modal">
+            <div class="upload-content">
+                <h2>Enviar Nova Imagem</h2>
+                <form id="upload-form">
+                    <div class="upload-area" id="drop-zone">
+                        <input type="file" id="file-input" accept=".jpg,.jpeg,.png,.gif" multiple hidden>
+                        <div class="upload-message">
+                            <span>Arraste imagens aqui ou clique para selecionar</span>
+                            <span class="upload-formats">(JPG, PNG, GIF)</span>
+                        </div>
+                    </div>
+                    <div id="preview-container" class="preview-container"></div>
+                    <div class="upload-buttons">
+                        <button type="submit">Enviar</button>
+                        <button type="button" id="cancel-upload">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
         <div id="galeria">
             <div class="grid">
                 <div class="imagem">
                     <a href="https://picsum.photos/id/76/4912/3264" download></a>
-                    <img src="https://picsum.photos/id/76/4912/3264" alt= "Imagem 1" id= "00">
+                    <img src="https://picsum.photos/id/76/4912/3264" alt="Imagem 1" id="00">
                 </div>
 
                 <div class="imagem">
                     <a href="https://picsum.photos/id/16/2500/1667" download></a>
-                    <img src="https://picsum.photos/id/16/2500/1667" alt="Imagem 2"  id= "01">
+                    <img src="https://picsum.photos/id/16/2500/1667" alt="Imagem 2" id="01">
                 </div>
 
                 <div class="imagem">
                     <a href="https://picsum.photos/id/17/2500/1667" download></a>
-                    <img src="https://picsum.photos/id/17/2500/1667" alt="Imagem 3" id= "02">
+                    <img src="https://picsum.photos/id/17/2500/1667" alt="Imagem 3" id="02">
                 </div>
 
                 <div class="imagem">
                     <a href="https://picsum.photos/id/13/2500/1667" download></a>
-                    <img src="https://picsum.photos/id/13/2500/1667" alt="Imagem 4" id= "03">
+                    <img src="https://picsum.photos/id/13/2500/1667" alt="Imagem 4" id="03">
                 </div>
 
                 <div class="imagem">
                     <a href="https://picsum.photos/id/103/2592/1936" download></a>
-                    <img src="https://picsum.photos/id/103/2592/1936" alt="Imagem 5" id= "04">
+                    <img src="https://picsum.photos/id/103/2592/1936" alt="Imagem 5" id="04">
                 </div>
 
                 <div class="imagem">
                     <a href="https://picsum.photos/id/237/3500/2095" download></a>
-                    <img src="https://picsum.photos/id/237/3500/2095" alt="Imagem 6" id= "05">
+                    <img src="https://picsum.photos/id/237/3500/2095" alt="Imagem 6" id="05">
                 </div>
 
                 <div class="imagem">
                     <a href="https://picsum.photos/id/350/5000/3338" download></a>
-                    <img src="https://picsum.photos/id/350/5000/3338" alt="Imagem 7" id= "06">
+                    <img src="https://picsum.photos/id/350/5000/3338" alt="Imagem 7" id="06">
                 </div>
 
                 <div class="imagem">
                     <a href="https://picsum.photos/id/1025/4951/3301" download></a>
-                    <img src="https://picsum.photos/id/1025/4951/3301" alt="Imagem 13" id= "07">
+                    <img src="https://picsum.photos/id/1025/4951/3301" alt="Imagem 13" id="07">
                 </div>
 
                 <div class="imagem">
                     <a href="https://picsum.photos/id/742/3333/5000" download></a>
-                    <img src="https://picsum.photos/id/742/3333/5000" alt="Imagem 8" id= "08">
+                    <img src="https://picsum.photos/id/742/3333/5000" alt="Imagem 8" id="08">
                 </div>
 
                 <div class="imagem">
                     <a href="https://picsum.photos/id/515/4585/3439" download></a>
-                    <img src="https://picsum.photos/id/515/4585/3439" alt="Imagem 9" id= "09">
+                    <img src="https://picsum.photos/id/515/4585/3439" alt="Imagem 9" id="09">
                 </div>
 
                 <div class="imagem">
                     <a href="https://picsum.photos/id/582/2509/1673" download></a>
-                    <img src="https://picsum.photos/id/582/2509/1673" alt="Imagem 10" id= "10">
+                    <img src="https://picsum.photos/id/582/2509/1673" alt="Imagem 10" id="10">
                 </div>
 
                 <div class="imagem">
                     <a href="https://picsum.photos/id/593/1774/2365" download></a>
-                    <img src="https://picsum.photos/id/593/1774/2365" alt="Imagem 11" id= "11">
+                    <img src="https://picsum.photos/id/593/1774/2365" alt="Imagem 11" id="11">
                 </div>
 
                 <div class="imagem">
                     <a href="https://picsum.photos/id/613/1670/2513" download></a>
-                    <img src="https://picsum.photos/id/613/1670/2513" alt="Imagem 12" id= "12">
+                    <img src="https://picsum.photos/id/613/1670/2513" alt="Imagem 12" id="12">
                 </div>
 
                 <div class="imagem">
                     <a href="https://picsum.photos/id/689/5000/3333" download></a>
-                    <img src="https://picsum.photos/id/689/5000/3333" alt="Imagem 14" id= "13">
+                    <img src="https://picsum.photos/id/689/5000/3333" alt="Imagem 14" id="13">
                 </div>
 
                 <div class="imagem">
                     <a href="https://picsum.photos/id/770/3000/2000" download> </a>
-                    <img src="https://picsum.photos/id/770/3000/2000" alt="Imagem 15" id= "14">
+                    <img src="https://picsum.photos/id/770/3000/2000" alt="Imagem 15" id="14">
                 </div>
 
                 <div class="imagem">
                     <a href="https://picsum.photos/id/767/3069/2048" download> </a>
-                    <img src="https://picsum.photos/id/767/3069/2048" alt="Imagem 16" id= "15">
+                    <img src="https://picsum.photos/id/767/3069/2048" alt="Imagem 16" id="15">
                 </div>
 
                 <div class="imagem">
                     <a href="https://picsum.photos/id/883/3000/2000" download></a>
-                    <img src="https://picsum.photos/id/883/3000/2000" alt="Imagem 17" id= "16">
+                    <img src="https://picsum.photos/id/883/3000/2000" alt="Imagem 17" id="16">
                 </div>
             </div>
 
-           
+
             <div class="button">
                 <button id="botao-fechar-galeria">Fechar Galeria</button>
             </div>
-         
+
 
             <div id="modal">
                 <div class="modal-content">
+                    <button class="side-nav-button nav-prev" id="side-prev">
+                        <i class="nav-arrow arrow-left"></i>
+                    </button>
+                    <button class="side-nav-button nav-next" id="side-next">
+                        <i class="nav-arrow arrow-right"></i>
+                    </button>
                     <img id="modal-image" src="">
                     <div class="modal-buttons">
                         <button id="prev">Anterior</button>
