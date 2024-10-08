@@ -82,8 +82,8 @@ loginForm.addEventListener('submit', (e) => {
         isLoggedIn = true;
         hideLoginModal();
         document.getElementById('galeria').style.display = 'block';
-        // Show upload section after successful login
         uploadSection.style.display = 'block';
+        updateUIBasedOnLogin(); // Atualiza a UI após o login
     } else {
         alert('Usuário ou senha incorretos!');
     }
@@ -155,8 +155,7 @@ function logout() {
     isLoggedIn = false;
     document.getElementById('galeria').style.display = 'none';
     uploadSection.style.display = 'none';
-    // Clear any uploaded images if desired
-    // uploadedImages = [];
+    updateUIBasedOnLogin(); // Atualiza a UI após o logout
 }
 
 imagens.forEach(image => {
@@ -438,13 +437,14 @@ function addImageToGallery(imgSrc) {
     const img = document.createElement('img');
     img.src = imgSrc;
     img.alt = 'Imagem Carregada';
+    img.id = getAllImages().length.toString().padStart(2, '0');
 
     newImageDiv.appendChild(img);
+    addDeleteButton(newImageDiv);
+    addShareButton(newImageDiv); // Adiciona o botão de compartilhamento
     grid.appendChild(newImageDiv);
 
     uploadedImages.push(imgSrc);
-
-    // Update click handlers after adding new image
     setupImageClickHandlers();
 }
 
@@ -537,3 +537,216 @@ function navigateToImage(index) {
 }
 
 document.addEventListener('DOMContentLoaded', setupImageClickHandlers);
+
+document.addEventListener('DOMContentLoaded', () => {
+    const imageDivs = document.querySelectorAll('.imagem');
+    imageDivs.forEach(imageDiv => {
+        if (!imageDiv.querySelector('.delete-button')) {
+            addDeleteButton(imageDiv);
+        }
+    });
+});
+
+// Função para adicionar o botão de exclusão às imagens
+function addDeleteButton(imageDiv) {
+    const deleteButton = document.createElement('button');
+    deleteButton.className = 'delete-button';
+    deleteButton.innerHTML = '×';
+    deleteButton.title = 'Excluir imagem';
+
+    deleteButton.addEventListener('click', (e) => {
+        e.stopPropagation(); // Evita que o modal da imagem abra ao clicar no botão de exclusão
+
+        if (confirm('Tem certeza que deseja excluir esta imagem?')) {
+            // Remove a imagem do array de imagens carregadas se ela existir lá
+            const img = imageDiv.querySelector('img');
+            const index = uploadedImages.indexOf(img.src);
+            if (index > -1) {
+                uploadedImages.splice(index, 1);
+            }
+
+            // Remove o elemento da galeria
+            imageDiv.remove();
+
+            // Atualiza os índices das imagens restantes
+            updateImageIndexes();
+        }
+    });
+
+    imageDiv.appendChild(deleteButton);
+}
+
+// Função para atualizar os índices das imagens após uma exclusão
+function updateImageIndexes() {
+    const allImages = getAllImages();
+    allImages.forEach((img, index) => {
+        img.id = index.toString().padStart(2, '0');
+    });
+}
+
+// Objeto para armazenar as descrições das imagens
+const imageDescriptions = {};
+
+// Elementos do DOM
+const searchContainer = document.querySelector('.search-container');
+const searchInput = document.getElementById('search-input');
+const searchButton = document.getElementById('search-button');
+const descriptionModal = document.getElementById('description-modal');
+const addDescriptionButton = document.getElementById('add-description');
+const saveDescriptionButton = document.getElementById('save-description');
+const cancelDescriptionButton = document.getElementById('cancel-description');
+const imageDescriptionTextarea = document.getElementById('image-description');
+
+// Função para mostrar/esconder elementos baseado no login
+function updateUIBasedOnLogin() {
+    if (isLoggedIn) {
+        searchContainer.style.display = 'flex';
+        addDescriptionButton.style.display = 'block';
+    } else {
+        searchContainer.style.display = 'none';
+        addDescriptionButton.style.display = 'none';
+    }
+}
+
+// Função para adicionar descrição à imagem
+function addDescription() {
+    const currentImage = getAllImages()[currentImageIndex];
+    imageDescriptionTextarea.value = imageDescriptions[currentImage.id] || '';
+    descriptionModal.style.display = 'flex';
+}
+
+// Função para salvar a descrição
+function saveDescription() {
+    const currentImage = getAllImages()[currentImageIndex];
+    const description = imageDescriptionTextarea.value.trim();
+
+    if (description) {
+        imageDescriptions[currentImage.id] = description;
+        updateDescriptionPreview(currentImage);
+    } else {
+        delete imageDescriptions[currentImage.id];
+        removeDescriptionPreview(currentImage);
+    }
+
+    descriptionModal.style.display = 'none';
+}
+
+// Função para atualizar a preview da descrição na miniatura
+function updateDescriptionPreview(image) {
+    const imageDiv = image.parentElement;
+    let descriptionPreview = imageDiv.querySelector('.image-description-preview');
+
+    if (!descriptionPreview) {
+        descriptionPreview = document.createElement('div');
+        descriptionPreview.className = 'image-description-preview';
+        imageDiv.appendChild(descriptionPreview);
+    }
+
+    descriptionPreview.textContent = imageDescriptions[image.id];
+}
+
+// Função para remover a preview da descrição
+function removeDescriptionPreview(image) {
+    const descriptionPreview = image.parentElement.querySelector('.image-description-preview');
+    if (descriptionPreview) {
+        descriptionPreview.remove();
+    }
+}
+
+// Função de pesquisa
+function searchImages() {
+    const searchTerm = searchInput.value.toLowerCase();
+    const allImages = getAllImages();
+
+    allImages.forEach(image => {
+        const description = imageDescriptions[image.id] || '';
+        const imageDiv = image.parentElement;
+
+        if (searchTerm === '' || description.toLowerCase().includes(searchTerm)) {
+            imageDiv.style.display = 'block';
+        } else {
+            imageDiv.style.display = 'none';
+        }
+    });
+}
+
+
+// Event Listeners
+addDescriptionButton.addEventListener('click', addDescription);
+saveDescriptionButton.addEventListener('click', saveDescription);
+cancelDescriptionButton.addEventListener('click', () => {
+    descriptionModal.style.display = 'none';
+});
+searchButton.addEventListener('click', searchImages);
+searchInput.addEventListener('keyup', (e) => {
+    if (e.key === 'Enter') {
+        searchImages();
+    }
+});
+
+// Inicialização
+document.addEventListener('DOMContentLoaded', () => {
+    updateUIBasedOnLogin();
+});
+
+// Função para adicionar o botão de compartilhamento às imagens
+function addShareButton(imageDiv) {
+    const shareButton = document.createElement('button');
+    shareButton.className = 'share-button';
+    shareButton.innerHTML = '↗';
+    shareButton.title = 'Compartilhar imagem';
+
+    shareButton.addEventListener('click', (e) => {
+        e.stopPropagation(); // Evita que o modal da imagem abra ao clicar no botão de compartilhamento
+
+        const img = imageDiv.querySelector('img');
+        const shareUrl = img.src;
+
+        // Copia o link para a área de transferência
+        navigator.clipboard.writeText(shareUrl).then(() => {
+            showTooltip('Link copiado com sucesso!', e);
+        }).catch(() => {
+            showTooltip('Erro ao copiar o link', e);
+        });
+    });
+
+    imageDiv.appendChild(shareButton);
+}
+
+// Função para mostrar o tooltip de confirmação
+function showTooltip(message, event) {
+    // Remove qualquer tooltip existente
+    const existingTooltip = document.querySelector('.tooltip');
+    if (existingTooltip) {
+        existingTooltip.remove();
+    }
+
+    // Cria um novo tooltip
+    const tooltip = document.createElement('div');
+    tooltip.className = 'tooltip';
+    tooltip.textContent = message;
+    document.body.appendChild(tooltip);
+
+    // Posiciona o tooltip próximo ao cursor
+    tooltip.style.left = `${event.pageX + 10}px`;
+    tooltip.style.top = `${event.pageY + 10}px`;
+
+    // Mostra o tooltip
+    setTimeout(() => tooltip.classList.add('show'), 10);
+
+    // Remove o tooltip após 2 segundos
+    setTimeout(() => {
+        tooltip.classList.remove('show');
+        setTimeout(() => tooltip.remove(), 300);
+    }, 2000);
+}
+
+// Adiciona os botões de compartilhamento às imagens existentes
+document.addEventListener('DOMContentLoaded', () => {
+    const imageDivs = document.querySelectorAll('.imagem');
+    imageDivs.forEach(imageDiv => {
+        if (!imageDiv.querySelector('.share-button')) {
+            addShareButton(imageDiv);
+        }
+    });
+});
