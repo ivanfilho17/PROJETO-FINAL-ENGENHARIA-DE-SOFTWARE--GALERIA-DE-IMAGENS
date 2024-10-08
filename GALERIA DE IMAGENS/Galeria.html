@@ -13,6 +13,10 @@
         <h1>Galeria de Imagens</h1>
         <div class="button">
             <button id="botao-abrir-galeria">Abrir Galeria</button>
+            <div class="search-container" style="display: none;">
+                <input type="text" id="search-input" placeholder="Pesquisar por descrição...">
+                <button id="search-button">Pesquisar</button>
+            </div>
         </div>
 
     </header>
@@ -105,6 +109,7 @@
                 </form>
             </div>
         </div>
+
 
 
         <div id="galeria">
@@ -222,9 +227,21 @@
                         <button id="remove-filter">Remover Filtros</button>
                         <button id="zoom-in">Zoom +</button>
                         <button id="zoom-out">Zoom -</button>
+                        <button id="add-description">Adicionar Descrição</button>
                         <button id="download">Baixar Original</button>
                         <button id="download-efeitos">Baixar Com Efeitos</button>
                         <button id="close">Fechar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="description-modal" class="description-modal">
+                <div class="description-content">
+                    <h2>Adicionar Descrição</h2>
+                    <textarea id="image-description" placeholder="Digite a descrição da imagem..."></textarea>
+                    <div class="description-buttons">
+                        <button id="save-description">Salvar</button>
+                        <button id="cancel-description">Cancelar</button>
                     </div>
                 </div>
             </div>
