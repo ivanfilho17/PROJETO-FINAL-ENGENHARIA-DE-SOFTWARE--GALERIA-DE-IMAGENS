@@ -4,20 +4,15 @@
   "description": "",
   "main": "script.js",
   "scripts": {
-    "start": "serve galeria_de_imagens",
     "test": "jest"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.7.0",
-    "serve": "^14.0.1"
+    "jest-environment-jsdom": "^29.7.0"
   },
   "jest": {
     "testEnvironment": "jsdom"
-  },
-  "dependencies": {
-    "meu-projeto": "file:"
   }
 }
